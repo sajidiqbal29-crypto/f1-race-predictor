@@ -17,16 +17,27 @@ st.success("Model loaded successfully! Ready for predictions.")
 
 st.divider()
 
-# User Inputs for Prediction
-st.subheader("🏁 Enter Race Details:")
+# User Inputs for Prediction matching training features
+st.subheader("🏁 Enter Race & Driver Details:")
 
 grid = st.slider("Starting Grid Position", min_value=1, max_value=20, value=1)
-points = st.number_input("Points", min_value=0.0, max_value=50.0, value=25.0)
+driverId = st.number_input("Driver ID", min_value=1, max_value=100, value=1)
+constructorId = st.number_input("Constructor ID", min_value=1, max_value=50, value=1)
+driver_points = st.number_input("Driver Points", min_value=0.0, max_value=500.0, value=25.0)
+driver_standing_pos = st.slider("Driver Standing Position", min_value=1, max_value=20, value=1)
+constructor_points = st.number_input("Constructor Points", min_value=0.0, max_value=1000.0, value=50.0)
+constructor_st = st.slider("Constructor Standing Position", min_value=1, max_value=20, value=1)
 
 # Prediction Button
 if st.button("Predict Winner"):
-    # Input data frame matching model features
-    input_data = pd.DataFrame([[grid, points]], columns=['grid', 'points'])
+    # Input data frame matching all 7 training features
+    input_data = pd.DataFrame([[
+        grid, driverId, constructorId, driver_points, 
+        driver_standing_pos, constructor_points, constructor_st
+    ]], columns=[
+        'grid', 'driverId', 'constructorId', 'driver_points', 
+        'driver_standing_pos', 'constructor_points', 'constructor_st'
+    ])
     
     prediction = model.predict(input_data)
     probability = model.predict_proba(input_data)
@@ -36,4 +47,3 @@ if st.button("Predict Winner"):
         st.success(f"🎉 *Prediction: WINNER!* (Win Probability: {probability[0][1]*100:.2f}%)")
     else:
         st.warning(f"❌ *Prediction: Not a Winner.* (Win Probability: {probability[0][1]*100:.2f}%)")
-
